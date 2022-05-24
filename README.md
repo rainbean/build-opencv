@@ -1,2 +1,1 @@
-# build_opencv
-Build OpenCV library
+# Build OpenCV library

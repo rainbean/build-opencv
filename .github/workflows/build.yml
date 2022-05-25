@@ -63,7 +63,7 @@ jobs:
           cmakeListsTxtPath: "${{ github.workspace }}/opencv/CMakeLists.txt"
           cmakeAppendedArgs: >
             '
-            -G "${{ matrix.generator }}"
+            -G "Unix Makefiles"
             -A "x64"
             -DCMAKE_BUILD_TYPE=Release
             -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/dist"

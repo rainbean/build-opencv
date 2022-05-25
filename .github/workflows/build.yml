@@ -63,9 +63,6 @@ jobs:
           cmakeListsTxtPath: "${{ github.workspace }}/opencv/CMakeLists.txt"
           cmakeAppendedArgs: >
             '
-            -G "${{ matrix.generator }}"
-            -A "x64"
-            -DCMAKE_BUILD_TYPE=Release
             -DWITH_EIGEN=ON
             -DWITH_TBB=ON
             -DWITH_OPENGL=ON

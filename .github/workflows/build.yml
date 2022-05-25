@@ -17,11 +17,11 @@ jobs:
           - os: ubuntu-18.04
             artifact: opencv-linux.tar.xz
             triplet: x64-linux
-            generator: Unix Makefiles
+            generator: "Unix Makefiles"
           - os: windows-2019
             artifact: opencv-win64.zip
             triplet: x64-windows
-            generator: Visual Studio 16 2019
+            generator: "Visual Studio 16 2019"
 
     steps:
       - uses: actions/checkout@v2
@@ -102,3 +102,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ github.workspace }}/${{ matrix.artifact }}
           tag: ${{ github.ref }}
+

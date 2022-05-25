@@ -1,10 +1,12 @@
 name: Build OpenCV
 
-# trigger on tags
-on:
-  push:
-    tags:
-      - "*"
+# # trigger on tags
+# on:
+#   push:
+#     tags:
+#       - "*"
+# manual trigger
+on: workflow_dispatch
 
 # for windows and linux
 jobs:
@@ -17,11 +19,11 @@ jobs:
           - os: ubuntu-18.04
             artifact: opencv-linux.tar.xz
             triplet: x64-linux
-            generator: '"Unix Makefiles"'
-          - os: windows-2019
-            artifact: opencv-win64.zip
-            triplet: x64-windows
-            generator: '"Visual Studio 16 2019"'
+            generator: Unix Makefiles
+#           - os: windows-2019
+#             artifact: opencv-win64.zip
+#             triplet: x64-windows
+#             generator: Visual Studio 16 2019
 
     steps:
       - uses: actions/checkout@v2
@@ -96,10 +98,10 @@ jobs:
         working-directory: ${{ github.workspace }}/dist
         run: tar Jcf ../${{ matrix.artifact }} *
 
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ github.workspace }}/${{ matrix.artifact }}
-          tag: ${{ github.ref }}
+#       - name: Upload binaries to release
+#         uses: svenstaro/upload-release-action@v2
+#         with:
+#           repo_token: ${{ secrets.GITHUB_TOKEN }}
+#           file: ${{ github.workspace }}/${{ matrix.artifact }}
+#           tag: ${{ github.ref }}
 

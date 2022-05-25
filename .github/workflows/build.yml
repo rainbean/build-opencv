@@ -61,25 +61,7 @@ jobs:
           buildWithCMakeArgs: '--target install --config Release'
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: "${{ github.workspace }}/opencv/CMakeLists.txt"
-          cmakeAppendedArgs: >
-            '
-            -DWITH_EIGEN=ON
-            -DWITH_TBB=ON
-            -DWITH_OPENGL=ON
-            -DBUILD_TIFF=ON
-            -DWITH_QT=OFF
-            -DWITH_FFMPEG=OFF
-            -DBUILD_opencv_apps=OFF
-            -DBUILD_DOCS=OFF
-            -DBUILD_PACKAGE=OFF
-            -DBUILD_PERF_TESTS=OFF
-            -DBUILD_TESTS=OFF
-            -DBUILD_JAVA=OFF
-            -DBUILD_opencv_python2=OFF
-            -DBUILD_opencv_python3=OFF
-            -DBUILD_LIST="imgcodecs,imgproc,highgui"
-            -DBUILD_opencv_world=ON
-            '
+          cmakeAppendedArgs: '-DBUILD_LIST="imgcodecs,imgproc,highgui"'
 
       - name: Pack Windows binaries
         if: contains(matrix.os, 'windows')

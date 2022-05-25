@@ -1,12 +1,10 @@
 name: Build OpenCV
 
-# # trigger on tags
-# on:
-#   push:
-#     tags:
-#       - "*"
-# manual trigger
-on: workflow_dispatch
+# trigger on tags
+on:
+  push:
+    tags:
+      - "*"
 
 # for windows and linux
 jobs:
@@ -16,10 +14,10 @@ jobs:
     strategy:
       matrix:
         include:
-#           - os: ubuntu-18.04
-#             artifact: opencv-linux.tar.xz
-#             triplet: x64-linux
-#             arch: ""
+          - os: ubuntu-18.04
+            artifact: opencv-linux.tar.xz
+            triplet: x64-linux
+            arch: ""
           - os: windows-2019
             artifact: opencv-win64.zip
             triplet: x64-windows
@@ -34,21 +32,21 @@ jobs:
         if: contains(matrix.os, 'windows')
         uses: microsoft/setup-msbuild@v1.0.2
 
-#       # Use prebuilt binary to workaround issue https://github.com/opencv/opencv/issues/9953
-#       - name: Download OpenBLAS
-#         if: contains(matrix.os, 'windows')
-#         working-directory: ${{ github.workspace }}
-#         run: |
-#           Invoke-WebRequest https://github.com/xianyi/OpenBLAS/releases/download/v0.3.13/OpenBLAS-0.3.13-x64.zip -O OpenBLAS.zip
-#           Expand-Archive OpenBLAS.zip OpenBLAS
-#           Copy-Item OpenBLAS\lib\libopenblas.lib OpenBLAS\lib\openblas.lib
+      # Use prebuilt binary to workaround issue https://github.com/opencv/opencv/issues/9953
+      - name: Download OpenBLAS
+        if: contains(matrix.os, 'windows')
+        working-directory: ${{ github.workspace }}
+        run: |
+          Invoke-WebRequest https://github.com/xianyi/OpenBLAS/releases/download/v0.3.13/OpenBLAS-0.3.13-x64.zip -O OpenBLAS.zip
+          Expand-Archive OpenBLAS.zip OpenBLAS
+          Copy-Item OpenBLAS\lib\libopenblas.lib OpenBLAS\lib\openblas.lib
 
-#       - name: Restore artifacts, or setup vcpkg
-#         uses: lukka/run-vcpkg@v7
-#         with:
-#           vcpkgDirectory: "${{ github.workspace }}/vcpkg"
-#           vcpkgTriplet: ${{ matrix.triplet }}
-#           vcpkgArguments: eigen3 tbb
+      - name: Setup vcpkg and libraries
+        uses: lukka/run-vcpkg@v7
+        with:
+          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
+          vcpkgTriplet: ${{ matrix.triplet }}
+          vcpkgArguments: eigen3 tbb
 
       - name: CMake configure and build
         uses: lukka/run-cmake@v3
@@ -57,7 +55,7 @@ jobs:
         with:
           useVcpkgToolchainFile: true
           buildDirectory: ${{ github.workspace }}/build
-          buildWithCMake: false
+          buildWithCMake: true
           buildWithCMakeArgs: '--target install --config Release'
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: "${{ github.workspace }}/opencv/CMakeLists.txt"
@@ -95,10 +93,10 @@ jobs:
         working-directory: ${{ github.workspace }}/dist
         run: tar Jcf ../${{ matrix.artifact }} *
 
-#       - name: Upload binaries to release
-#         uses: svenstaro/upload-release-action@v2
-#         with:
-#           repo_token: ${{ secrets.GITHUB_TOKEN }}
-#           file: ${{ github.workspace }}/${{ matrix.artifact }}
-#           tag: ${{ github.ref }}
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ github.workspace }}/${{ matrix.artifact }}
+          tag: ${{ github.ref }}
 

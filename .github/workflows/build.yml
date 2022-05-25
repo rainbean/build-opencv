@@ -20,10 +20,10 @@ jobs:
             artifact: opencv-linux.tar.xz
             triplet: x64-linux
             arch: ""
-#           - os: windows-2019
-#             artifact: opencv-win64.zip
-#             triplet: x64-windows
-#             arch: -G "Visual Studio 16 2019" -A "x64"
+          - os: windows-2019
+            artifact: opencv-win64.zip
+            triplet: x64-windows
+            arch: -G "Visual Studio 16 2019" -A "x64"
 
     steps:
       - uses: actions/checkout@v2

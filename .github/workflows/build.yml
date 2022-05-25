@@ -23,7 +23,7 @@ jobs:
           - os: windows-2019
             artifact: opencv-win64.zip
             triplet: x64-windows
-            arch: '-G "Visual Studio 16 2019" -A "x64"'
+            arch: -G \"Visual Studio 16 2019\" -A x64
 
     steps:
       - uses: actions/checkout@v2

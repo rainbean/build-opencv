@@ -63,7 +63,6 @@ jobs:
           cmakeListsTxtPath: "${{ github.workspace }}/opencv/CMakeLists.txt"
           cmakeAppendedArgs: >
             '
-            -A "x64"
             -DCMAKE_BUILD_TYPE=Release
             -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/dist"
             -DWITH_EIGEN=ON

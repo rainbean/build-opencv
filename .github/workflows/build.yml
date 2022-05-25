@@ -19,7 +19,7 @@ jobs:
           - os: ubuntu-18.04
             artifact: opencv-linux.tar.xz
             triplet: x64-linux
-            generator: Unix Makefiles
+            generator: ""
 #           - os: windows-2019
 #             artifact: opencv-win64.zip
 #             triplet: x64-windows
@@ -57,7 +57,7 @@ jobs:
         with:
           useVcpkgToolchainFile: true
           buildDirectory: ${{ github.workspace }}/build
-          buildWithCMake: true
+          buildWithCMake: false
           buildWithCMakeArgs: '--target install --config Release'
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: "${{ github.workspace }}/opencv/CMakeLists.txt"

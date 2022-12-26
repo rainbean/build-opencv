@@ -34,6 +34,7 @@ cmake -Bbuild \
       -DBUILD_JAVA=OFF \
       -DBUILD_opencv_python2=OFF \
       -DBUILD_opencv_python3=OFF \
+      -DCV_TRACE=OFF \
       -DBUILD_LIST="imgcodecs,imgproc,highgui" \
       -DBUILD_opencv_world=ON
 

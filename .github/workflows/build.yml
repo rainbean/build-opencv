@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-18.04
+          - os: ubuntu-20.04
             artifact: opencv-linux.tar.xz
             triplet: x64-linux
             arch: ""
@@ -41,8 +41,18 @@ jobs:
           Expand-Archive OpenBLAS.zip OpenBLAS
           Copy-Item OpenBLAS\lib\libopenblas.lib OpenBLAS\lib\openblas.lib
 
+      - name: Build OpenBLAS
+        if: contains(matrix.os, 'ubuntu')
+        working-directory: ${{ github.workspace }}
+        run: |
+          wget https://github.com/xianyi/OpenBLAS/releases/download/v0.3.21/OpenBLAS-0.3.21.tar.gz -O OpenBLAS.tgz
+          tar xf OpenBLAS.tgz
+          cd OpenBLAS-0.3.21
+          make
+          make install PREFIX=../OpenBLAS
+
       - name: Setup vcpkg and libraries
-        uses: lukka/run-vcpkg@v7
+        uses: lukka/run-vcpkg@v10
         with:
           vcpkgDirectory: "${{ github.workspace }}/vcpkg"
           vcpkgTriplet: ${{ matrix.triplet }}
@@ -68,6 +78,7 @@ jobs:
             -DWITH_OPENGL=ON
             -DBUILD_TIFF=ON
             -DWITH_QT=OFF
+            -DWITH_OPENEXR=OFF
             -DWITH_FFMPEG=OFF
             -DBUILD_opencv_apps=OFF
             -DBUILD_DOCS=OFF
@@ -91,7 +102,9 @@ jobs:
       - name: Pack Linux binaries
         if: contains(matrix.os, 'ubuntu')
         working-directory: ${{ github.workspace }}/dist
-        run: tar Jcf ../${{ matrix.artifact }} *
+        run: |
+          cp -a ../OpenBLAS/lib/*.so lib/
+          tar Jcf ../${{ matrix.artifact }} *
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2

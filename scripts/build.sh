@@ -15,7 +15,7 @@ echo "Install vcpkg libraries"
 
 # Build opencv
 cd opencv
-cmake -Bbuild -H. \
+cmake -Bbuild \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX="../dist" \
       -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" \
@@ -34,7 +34,7 @@ cmake -Bbuild -H. \
       -DBUILD_JAVA=OFF \
       -DBUILD_opencv_python2=OFF \
       -DBUILD_opencv_python3=OFF \
-      -DBUILD_LIST=imgcodecs,imgproc,highgui \
+      -DBUILD_LIST="imgcodecs,imgproc,highgui" \
       -DBUILD_opencv_world=ON
 
 # Build

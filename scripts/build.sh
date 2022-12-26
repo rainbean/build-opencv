@@ -35,6 +35,7 @@ cmake -Bbuild \
       -DBUILD_opencv_python2=OFF \
       -DBUILD_opencv_python3=OFF \
       -DCV_TRACE=OFF \
+      -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE \
       -DBUILD_LIST="imgcodecs,imgproc,highgui" \
       -DBUILD_opencv_world=ON
 
@@ -45,6 +46,6 @@ make install
 
 # pack
 cd ../../dist
-cp -a ../OpenBLAS/lib/*.so lib/
+cp -aP ../OpenBLAS/lib/*.so* lib/
 export XZ_DEFAULTS="-T 0"
 tar Jcf ../opencv-linux.tar.xz *

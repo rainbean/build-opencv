@@ -88,6 +88,7 @@ jobs:
             -DBUILD_JAVA=OFF
             -DBUILD_opencv_python2=OFF
             -DBUILD_opencv_python3=OFF
+            -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE
             -DCV_TRACE=OFF
             -DBUILD_LIST="imgcodecs,imgproc,highgui"
             -DBUILD_opencv_world=ON
@@ -104,7 +105,7 @@ jobs:
         if: contains(matrix.os, 'ubuntu')
         working-directory: ${{ github.workspace }}/dist
         run: |
-          cp -a ../OpenBLAS/lib/*.so lib/
+          cp -a ../OpenBLAS/lib/*.so* lib/
           tar Jcf ../${{ matrix.artifact }} *
 
       - name: Upload binaries to release

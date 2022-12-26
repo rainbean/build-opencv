@@ -52,7 +52,7 @@ jobs:
           make install PREFIX=../OpenBLAS
 
       - name: Setup vcpkg and libraries
-        uses: lukka/run-vcpkg@v10
+        uses: lukka/run-vcpkg@v7
         with:
           vcpkgDirectory: "${{ github.workspace }}/vcpkg"
           vcpkgTriplet: ${{ matrix.triplet }}

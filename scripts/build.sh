@@ -1,17 +1,7 @@
-# Download and install OpenBLAS
-wget https://github.com/xianyi/OpenBLAS/releases/download/v0.3.21/OpenBLAS-0.3.21.tar.gz -O OpenBLAS.tgz
-tar xf OpenBLAS.tgz
-cd OpenBLAS-0.3.21
-make
-make install PREFIX=../OpenBLAS
-cd ..
-export OpenBLAS_HOME="$PWD/OpenBLAS"
-
 # install required 3rd party libraries
 echo "Install vcpkg libraries"
 ./vcpkg/bootstrap-vcpkg.sh
 ./vcpkg/vcpkg install eigen3 tbb --triplet x64-linux --clean-after-build
-# linux vcpkg openblas dependencies is missing https://github.com/microsoft/vcpkg/issues/23333
 
 # Build opencv
 cd opencv
@@ -23,6 +13,10 @@ cmake -Bbuild \
       -DWITH_TBB=ON \
       -DWITH_OPENGL=ON \
       -DBUILD_TIFF=ON \
+      -DBUILD_PNG=ON \
+      -DBUILD_JPEG=ON \
+      -DBUILD_WEBP=ON \
+      -DBUILD_OPENJPEG=ON \
       -DWITH_QT=OFF \
       -DWITH_OPENEXR=OFF \
       -DWITH_FFMPEG=OFF \

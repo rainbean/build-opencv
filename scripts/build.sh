@@ -32,9 +32,7 @@ cmake -Bbuild \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX="${DIST_PATH}" \
       -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-      -DOPENCV_EXTRA_MODULES_PATH="$PWD/opencv_contrib/modules" \
       -DWITH_TBB=ON \
-      -DWITH_CUDA=ON \
       -DWITH_OPENGL=ON \
       -DBUILD_TIFF=ON \
       -DBUILD_PNG=ON \
@@ -55,7 +53,7 @@ cmake -Bbuild \
       -DBUILD_opencv_python3=OFF \
       -DCV_TRACE=OFF \
       -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE \
-      -DBUILD_LIST="imgcodecs,imgproc,highgui,cudaimgproc,cudev" \
+      -DBUILD_LIST="imgcodecs,imgproc,highgui" \
       -DBUILD_opencv_world=ON \
       opencv
 cmake --build build -j 4 -t install
@@ -63,13 +61,6 @@ echo "::endgroup::"
 
 # pack binary
 echo "::group::Pack artifacts ..."
-
-cp -a /usr/local/cuda/lib64/libnppc.so* $DIST_PATH/lib
-cp -a /usr/local/cuda/lib64/libnppial.so* $DIST_PATH/lib
-cp -a /usr/local/cuda/lib64/libnppicc.so* $DIST_PATH/lib
-cp -a /usr/local/cuda/lib64/libnppidei.so* $DIST_PATH/lib
-cp -a /usr/local/cuda/lib64/libnppist.so* $DIST_PATH/lib
-
 TARGET=${1:-'opencv-linux.tar.zst'}
 tar "-I zstd -3 -T4 --long=27" -cf $TARGET \
     -C $DIST_PATH $(cd $DIST_PATH; echo *)

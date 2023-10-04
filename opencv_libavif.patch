@@ -1,0 +1,74 @@
+diff --git a/opencv/cmake/OpenCVFindAOM.cmake b/opencv/cmake/OpenCVFindAOM.cmake
+new file mode 100644
+index 0000000000..2c89d32cf8
+--- /dev/null
++++ b/opencv/cmake/OpenCVFindAOM.cmake
+@@ -0,0 +1,18 @@
++#=============================================================================
++# Find AOM library
++#=============================================================================
++# Find the native AOM headers and libraries.
++#
++#  AOM_FOUND        - True if AOM is found.
++#=============================================================================
++
++# Look for the header file.
++
++unset(AOM_FOUND)
++
++find_package(aom QUIET)
++
++FIND_LIBRARY(AOM_LIBRARY NAMES aom)
++MARK_AS_ADVANCED(AOM_LIBRARY)
++
++SET(AOM_FOUND TRUE)
+diff --git a/opencv/cmake/OpenCVFindLibsGrfmt.cmake b/opencv/cmake/OpenCVFindLibsGrfmt.cmake
+index e544f78eaa..65be87ee09 100644
+--- a/opencv/cmake/OpenCVFindLibsGrfmt.cmake
++++ b/opencv/cmake/OpenCVFindLibsGrfmt.cmake
+@@ -42,6 +42,8 @@ endif()
+ if(WITH_AVIF)
+   ocv_clear_internal_cache_vars(AVIF_LIBRARY AVIF_INCLUDE_DIR)
+   include(cmake/OpenCVFindAVIF.cmake)
++  include(cmake/OpenCVFindAOM.cmake)
++  include(cmake/OpenCVFindYUV.cmake)
+   if(AVIF_FOUND)
+     set(HAVE_AVIF 1)
+   endif()
+diff --git a/opencv/cmake/OpenCVFindYUV.cmake b/opencv/cmake/OpenCVFindYUV.cmake
+new file mode 100644
+index 0000000000..9a44a99331
+--- /dev/null
++++ b/opencv/cmake/OpenCVFindYUV.cmake
+@@ -0,0 +1,18 @@
++#=============================================================================
++# Find YUV library
++#=============================================================================
++# Find the native YUV headers and libraries.
++#
++#  YUV_FOUND        - True if YUV is found.
++#=============================================================================
++
++# Look for the header file.
++
++unset(YUV_FOUND)
++
++find_package(yuv QUIET)
++
++FIND_LIBRARY(YUV_LIBRARY NAMES yuv)
++MARK_AS_ADVANCED(YUV_LIBRARY)
++
++SET(YUVAOM_FOUND TRUE)
+diff --git a/opencv/modules/imgcodecs/CMakeLists.txt b/opencv/modules/imgcodecs/CMakeLists.txt
+index 8183837c43..2c64508193 100644
+--- a/opencv/modules/imgcodecs/CMakeLists.txt
++++ b/opencv/modules/imgcodecs/CMakeLists.txt
+@@ -16,6 +16,8 @@ endif()
+ if (HAVE_AVIF)
+   ocv_include_directories(${AVIF_INCLUDE_DIR})
+   list(APPEND GRFMT_LIBS ${AVIF_LIBRARY})
++  list(APPEND GRFMT_LIBS ${AOM_LIBRARY})
++  list(APPEND GRFMT_LIBS ${YUV_LIBRARY})
+ endif()
+ 
+ if(HAVE_JPEG)

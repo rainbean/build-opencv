@@ -1,10 +1,15 @@
-name: Build OpenCV
+name: Build
 
 # trigger on tags
 on:
   push:
     tags:
       - "*"
+
+# an undocumented permissions thing required for AWS Credentials
+permissions:
+  id-token: write
+  contents: read
 
 # for windows and linux
 jobs:
@@ -15,84 +20,43 @@ jobs:
       matrix:
         include:
           - os: ubuntu-20.04
-            artifact: opencv-linux.tar.xz
-            triplet: x64-linux
-            arch: ""
+            artifact: opencv-linux-${{ github.ref_name }}.tar.zst
           - os: windows-2019
-            artifact: opencv-win64.zip
-            triplet: x64-windows
-            arch: -A x64
+            artifact: opencv-win64-${{ github.ref_name }}.7z
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
 
       - name: Add MSBuild to PATH
         if: contains(matrix.os, 'windows')
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v1.1
 
-      - name: Setup vcpkg and libraries
-        uses: lukka/run-vcpkg@v7
-        with:
-          vcpkgDirectory: "${{ github.workspace }}/vcpkg"
-          vcpkgTriplet: ${{ matrix.triplet }}
-          vcpkgArguments: eigen3 tbb
+      - name: Free disk space
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
-      - name: CMake configure and build
-        uses: lukka/run-cmake@v3
-        with:
-          useVcpkgToolchainFile: true
-          buildDirectory: ${{ github.workspace }}/build
-          buildWithCMake: true
-          buildWithCMakeArgs: '--target install --config Release'
-          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-          cmakeListsTxtPath: "${{ github.workspace }}/opencv/CMakeLists.txt"
-          cmakeAppendedArgs: >
-            "${{ matrix.arch }}"
-            -DCMAKE_BUILD_TYPE=Release
-            -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/dist"
-            -DWITH_EIGEN=ON
-            -DWITH_TBB=ON
-            -DWITH_OPENGL=ON
-            -DBUILD_TIFF=ON
-            -DBUILD_PNG=ON
-            -DBUILD_JPEG=ON
-            -DBUILD_WEBP=ON
-            -DBUILD_OPENJPEG=ON
-            -DWITH_QT=OFF
-            -DWITH_OPENEXR=OFF
-            -DWITH_FFMPEG=OFF
-            -DBUILD_opencv_apps=OFF
-            -DBUILD_DOCS=OFF
-            -DBUILD_PACKAGE=OFF
-            -DBUILD_PERF_TESTS=OFF
-            -DBUILD_TESTS=OFF
-            -DBUILD_JAVA=OFF
-            -DBUILD_opencv_python2=OFF
-            -DBUILD_opencv_python3=OFF
-            -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE
-            -DCV_TRACE=OFF
-            -DBUILD_LIST="imgcodecs,imgproc,highgui"
-            -DBUILD_opencv_world=ON
+      - name: Build Linux artifact
+        if: contains(matrix.os, 'ubuntu')
+        working-directory: ${{ github.workspace }}
+        run: scripts/build.sh ${{ matrix.artifact }}
 
-      - name: Pack Windows binaries
+      - name: Build Windows artifact
         if: contains(matrix.os, 'windows')
         working-directory: ${{ github.workspace }}
-        run: |
-          Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll dist\x64\vc16\bin\
-          Compress-Archive -Path dist\* -DestinationPath ${{ matrix.artifact }}
+        run: scripts/build.ps1 ${{ matrix.artifact }}
 
-      - name: Pack Linux binaries
-        if: contains(matrix.os, 'ubuntu')
-        working-directory: ${{ github.workspace }}/dist
-        run: |
-          tar Jcf ../${{ matrix.artifact }} *
-
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ github.workspace }}/${{ matrix.artifact }}
-          tag: ${{ github.ref }}
+          role-to-assume: ${{ secrets.aws_iam_role }}
+          aws-region: ap-northeast-1
+
+      - name: Upload artifact
+        working-directory: ${{ github.workspace }}
+        run: |
+          aws s3 cp ${{ matrix.artifact }} ${{ secrets.aws_s3_bucket }}
 

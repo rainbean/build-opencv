@@ -15,7 +15,6 @@ then
     echo "::endgroup::"
 fi
 
-
 # Apply patch to submodules
 if [ ! -f "./opencv/cmake/OpenCVFindAOM.cmake" ]
 then

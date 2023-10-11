@@ -19,7 +19,7 @@ fi
 if [ ! -f "./opencv/cmake/OpenCVFindAOM.cmake" ]
 then
     echo "::group::Patch libavif ..."
-    git apply --ignore-space-change --ignore-whitespace opencv_libavif.patch
+    git apply --ignore-space-change --ignore-whitespace patch/opencv_libavif.patch
     echo "::endgroup::"
 fi
 

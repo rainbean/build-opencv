@@ -16,22 +16,23 @@ if (!(Test-Path .\vcpkg\installed\x64-windows)) {
     # replace MKL interface to LP
     $MKL_CMAKE = ".\vcpkg\ports\intel-mkl\portfile.cmake"
     (Get-content $MKL_CMAKE) | Foreach-Object {
-        $_ -replace "ilp64", "lp64" -replace "dynamic", "static"
+        $_ -replace "ilp64", "lp64"
     } | Set-Content $MKL_CMAKE
     # specify triplet
-    $env:VCPKG_DEFAULT_HOST_TRIPLET = "x64-windows-release"
-    $env:VCPKG_DEFAULT_TRIPLET = "x64-windows-release"
+    $env:VCPKG_DEFAULT_HOST_TRIPLET = "x64-windows"
+    $env:VCPKG_DEFAULT_TRIPLET = "x64-windows"
+    # overwrite default triplet definition
+    Copy-Item patch\x64-windows.cmake vcpkg\triplets\
+    # install required libraries
     .\vcpkg\bootstrap-vcpkg.bat
     .\vcpkg\vcpkg install intel-mkl libavif tbb --clean-after-build
-    # workaround: opencv failed to detect release triplet
-    New-Item -ItemType Junction -Path "$PWD/vcpkg/installed/x64-windows" -Target "$PWD/vcpkg/installed/x64-windows-release"
     Write-Output "::endgroup::"
 }
 
 # Apply patch to submodules
 if (!(Test-Path .\opencv\cmake\OpenCVFindAOM.cmake)) {
     Write-Output "::group::Patch libavif ..."
-    git apply --ignore-space-change --ignore-whitespace opencv_libavif.patch
+    git apply --ignore-space-change --ignore-whitespace patch\opencv_libavif.patch
     Write-Output "::endgroup::"
 }
 
@@ -78,18 +79,7 @@ cmake --build build -j 4 -t install --config Release
 Write-Output "::endgroup::"
 
 # # define MKL path
-# $MKL_PATH = "$PWD\vcpkg\installed\x64-windows-static\lib\intel64"
-# $MKL_LIBRARIES = "${MKL_PATH}\mkl_intel_lp64.lib;${MKL_PATH}\mkl_intel_thread.lib;${MKL_PATH}\mkl_core.lib;${MKL_PATH}\libiomp5md.lib"
-# $DIST_PATH = "$PWD\dist"
-
-# # copy artifacts and change config
-# cp $MKL_PATH\mkl_intel_lp64.lib $DIST_PATH\lib
-# cp $MKL_PATH\mkl_intel_thread.lib $DIST_PATH\lib
-# cp $MKL_PATH\mkl_core.lib $DIST_PATH\lib
-# cp $MKL_PATH\libiomp5md.lib $DIST_PATH\lib
-# cp $MKL_PATH\libiomp5md.lib $DIST_PATH\lib
-# mkdir -p $DIST_PATH\bin
-# cp $MKL_PATH\..\..\bin\libiomp5md.dll $DIST_PATH\bin
+Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll dist\x64\vc16\bin\
 
 # pack binary
 Write-Output "::group::Pack artifacts ..."

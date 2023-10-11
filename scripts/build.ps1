@@ -11,30 +11,29 @@ if (!(Get-Command nasm -errorAction SilentlyContinue)) {
 }
 
 # install required 3rd party libraries
-if (!(Test-Path .\vcpkg\installed\x64-windows-static)) {
-    # refer to https://github.com/facebookresearch/faiss/issues/2641
+if (!(Test-Path .\vcpkg\installed\x64-windows)) {
+    Write-Output "::group::Install vcpkg libraries ..."
     # replace MKL interface to LP
     $MKL_CMAKE = ".\vcpkg\ports\intel-mkl\portfile.cmake"
     (Get-content $MKL_CMAKE) | Foreach-Object {
-        $_ -replace "ilp64", "lp64" -replace "sequential", "intel_thread" 
+        $_ -replace "ilp64", "lp64" -replace "dynamic", "static"
     } | Set-Content $MKL_CMAKE
-
-    Write-Output "::group::Install vcpkg libraries ..."
     # specify triplet
-    $env:VCPKG_DEFAULT_HOST_TRIPLET = x64-windows-static
-    $env:export VCPKG_DEFAULT_TRIPLET = x64-windows-static
+    $env:VCPKG_DEFAULT_HOST_TRIPLET = "x64-windows-release"
+    $env:VCPKG_DEFAULT_TRIPLET = "x64-windows-release"
     .\vcpkg\bootstrap-vcpkg.bat
-    .\vcpkg\vcpkg install libavif tbb --clean-after-build
+    .\vcpkg\vcpkg install intel-mkl libavif tbb --clean-after-build
+    # workaround: opencv failed to detect release triplet
+    New-Item -ItemType Junction -Path "$PWD/vcpkg/installed/x64-windows" -Target "$PWD/vcpkg/installed/x64-windows-release"
     Write-Output "::endgroup::"
 }
 
 # Apply patch to submodules
-if [ ! -f "./opencv/cmake/OpenCVFindAOM.cmake" ]
-then
-    echo "::group::Patch libavif ..."
+if (!(Test-Path .\opencv\cmake\OpenCVFindAOM.cmake)) {
+    Write-Output "::group::Patch libavif ..."
     git apply --ignore-space-change --ignore-whitespace opencv_libavif.patch
-    echo "::endgroup::"
-fi
+    Write-Output "::endgroup::"
+}
 
 # Build opencv
 Write-Output "::group::Configure CMake and Build ..."
@@ -44,12 +43,13 @@ if (Test-Path build) {
 if (Test-Path dist) {
     rm -r dist
 }
-DIST_PATH="$PWD/dist"
+
+$DIST_PATH = "${PWD}/dist"
 cmake -Bbuild `
       -A x64 `
       -Wno-dev `
       -DCMAKE_INSTALL_PREFIX="${DIST_PATH}" `
-      -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" `
+      -DCMAKE_TOOLCHAIN_FILE="${PWD}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
       -DWITH_TBB=ON `
       -DWITH_OPENGL=ON `
       -DBUILD_TIFF=ON `

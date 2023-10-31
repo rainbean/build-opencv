@@ -23,8 +23,6 @@ if (!(Test-Path .\vcpkg\installed\x64-windows)) {
     # specify triplet
     $env:VCPKG_DEFAULT_HOST_TRIPLET = "x64-windows"
     $env:VCPKG_DEFAULT_TRIPLET = "x64-windows"
-    # overwrite default triplet definition
-    Copy-Item patch\x64-windows.cmake vcpkg\triplets\
     # install required libraries
     .\vcpkg\bootstrap-vcpkg.bat
     .\vcpkg\vcpkg install eigen3 tbb --clean-after-build
@@ -85,7 +83,7 @@ Write-Output "::endgroup::"
 # pack binary
 Write-Output "::group::Pack artifacts ..."
 # copy deps binary
-Copy-Item vcpkg\installed\x64-windows\bin\*.dll $DIST_PATH\x64\vc16\bin\
+Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll $DIST_PATH\x64\vc16\bin\
 Copy-Item $env:OpenBLAS_HOME\bin\*.dll $DIST_PATH\x64\vc16\bin\
 # pack binary
 Push-Location $DIST_PATH

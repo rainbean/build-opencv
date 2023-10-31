@@ -1,27 +1,31 @@
 #!/bin/bash
 
 # install required 3rd party libraries
-
-if [ ! -d "./vcpkg/installed/x64-linux-release/lib" ]
+if [ ! -d "./vcpkg/installed/x64-linux/lib" ]
 then
     echo "::group::Install vcpkg libraries ..."
     # specify triplet
-    export VCPKG_DEFAULT_HOST_TRIPLET=x64-linux-release
-    export VCPKG_DEFAULT_TRIPLET=x64-linux-release
+    export VCPKG_DEFAULT_HOST_TRIPLET=x64-linux
+    export VCPKG_DEFAULT_TRIPLET=x64-linux
     ./vcpkg/bootstrap-vcpkg.sh
     ./vcpkg/vcpkg install eigen3 tbb --clean-after-build
-    # workaround: opencv failed to detect release triplet
-    ln -s $PWD/vcpkg/installed/x64-linux-release vcpkg/installed/x64-linux
     echo "::endgroup::"
 fi
 
-# Apply patch to submodules
-# if [ ! -f "./opencv/cmake/OpenCVFindAOM.cmake" ]
-# then
-#     echo "::group::Patch libavif ..."
-#     git apply --ignore-space-change --ignore-whitespace patch/opencv_libavif.patch
-#     echo "::endgroup::"
-# fi
+# Download OpenBLAS
+export OpenBLAS_HOME="$PWD/OpenBLAS"
+if [ ! -d $OpenBLAS_HOME ]
+then
+    echo "::group::Download OpenBLAS ..."
+    wget https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.24/OpenBLAS-0.3.24.tar.gz -O OpenBLAS.tgz
+    tar xf OpenBLAS.tgz
+    cd OpenBLAS-0.3.24
+    make
+    make install PREFIX=$OpenBLAS_HOME
+    cd ..
+    rm -fr OpenBLAS-0.3.24 OpenBLAS.tgz
+    echo "::endgroup::"
+fi
 
 # Build opencv
 echo "::group::Configure CMake and Build ..."
@@ -60,6 +64,7 @@ echo "::endgroup::"
 
 # pack binary
 echo "::group::Pack artifacts ..."
+cp -a $OpenBLAS_HOME/lib/*.so* $DIST_PATH/lib
 TARGET=${1:-'opencv-linux.tar.zst'}
 tar "-I zstd -3 -T4 --long=27" -cf $TARGET \
     -C $DIST_PATH $(cd $DIST_PATH; echo *)

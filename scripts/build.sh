@@ -9,19 +9,19 @@ then
     export VCPKG_DEFAULT_HOST_TRIPLET=x64-linux-release
     export VCPKG_DEFAULT_TRIPLET=x64-linux-release
     ./vcpkg/bootstrap-vcpkg.sh
-    ./vcpkg/vcpkg install intel-mkl libavif tbb --clean-after-build
+    ./vcpkg/vcpkg install eigen3 tbb --clean-after-build
     # workaround: opencv failed to detect release triplet
     ln -s $PWD/vcpkg/installed/x64-linux-release vcpkg/installed/x64-linux
     echo "::endgroup::"
 fi
 
 # Apply patch to submodules
-if [ ! -f "./opencv/cmake/OpenCVFindAOM.cmake" ]
-then
-    echo "::group::Patch libavif ..."
-    git apply --ignore-space-change --ignore-whitespace patch/opencv_libavif.patch
-    echo "::endgroup::"
-fi
+# if [ ! -f "./opencv/cmake/OpenCVFindAOM.cmake" ]
+# then
+#     echo "::group::Patch libavif ..."
+#     git apply --ignore-space-change --ignore-whitespace patch/opencv_libavif.patch
+#     echo "::endgroup::"
+# fi
 
 # Build opencv
 echo "::group::Configure CMake and Build ..."
@@ -38,7 +38,7 @@ cmake -Bbuild \
       -DBUILD_JPEG=ON \
       -DBUILD_WEBP=ON \
       -DBUILD_OPENJPEG=ON \
-      -DWITH_AVIF=ON \
+      -DWITH_AVIF=OFF \
       -DWITH_QT=OFF \
       -DWITH_OPENEXR=OFF \
       -DWITH_FFMPEG=OFF \

@@ -20,11 +20,6 @@ if (!(Get-Command nasm -errorAction SilentlyContinue)) {
 # install required 3rd party libraries
 if (!(Test-Path .\vcpkg\installed\x64-windows)) {
     Write-Output "::group::Install vcpkg libraries ..."
-    # replace MKL interface to LP
-    $MKL_CMAKE = ".\vcpkg\ports\intel-mkl\portfile.cmake"
-    (Get-content $MKL_CMAKE) | Foreach-Object {
-        $_ -replace "ilp64", "lp64"
-    } | Set-Content $MKL_CMAKE
     # specify triplet
     $env:VCPKG_DEFAULT_HOST_TRIPLET = "x64-windows"
     $env:VCPKG_DEFAULT_TRIPLET = "x64-windows"
@@ -32,15 +27,16 @@ if (!(Test-Path .\vcpkg\installed\x64-windows)) {
     Copy-Item patch\x64-windows.cmake vcpkg\triplets\
     # install required libraries
     .\vcpkg\bootstrap-vcpkg.bat
-    .\vcpkg\vcpkg install intel-mkl libavif tbb --clean-after-build
+    .\vcpkg\vcpkg install eigen3 tbb --clean-after-build
     Write-Output "::endgroup::"
 }
 
-# Apply patch to submodules
-if (!(Test-Path .\opencv\cmake\OpenCVFindAOM.cmake)) {
-    Write-Output "::group::Patch libavif ..."
-    git apply --ignore-space-change --ignore-whitespace patch\opencv_libavif.patch
-    Write-Output "::endgroup::"
+# Donwload OpenBLAS
+$env:OpenBLAS_HOME = "${PWD}\OpenBLAS"
+if (!(Test-Path $env:OpenBLAS_HOME)) {
+    Invoke-WebRequest https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.24/OpenBLAS-0.3.24-x64.zip -O OpenBLAS.zip
+    Expand-Archive OpenBLAS.zip OpenBLAS
+    Copy-Item OpenBLAS\lib\libopenblas.lib OpenBLAS\lib\openblas.lib
 }
 
 # Build opencv
@@ -54,6 +50,7 @@ if (Test-Path dist) {
 
 $DIST_PATH = "${PWD}/dist"
 cmake -Bbuild `
+      -G "Visual Studio 16 2019" `
       -A x64 `
       -Wno-dev `
       -DCMAKE_INSTALL_PREFIX="${DIST_PATH}" `
@@ -65,7 +62,7 @@ cmake -Bbuild `
       -DBUILD_JPEG=ON `
       -DBUILD_WEBP=ON `
       -DBUILD_OPENJPEG=ON `
-      -DWITH_AVIF=ON `
+      -DWITH_AVIF=OFF `
       -DWITH_QT=OFF `
       -DWITH_OPENEXR=OFF `
       -DWITH_FFMPEG=OFF `
@@ -85,11 +82,11 @@ cmake -Bbuild `
 cmake --build build -j 4 -t install --config Release
 Write-Output "::endgroup::"
 
-# # define MKL path
-Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll dist\x64\vc16\bin\
-
 # pack binary
 Write-Output "::group::Pack artifacts ..."
+# copy deps binary
+Copy-Item vcpkg\installed\x64-windows\bin\*.dll $DIST_PATH\x64\vc16\bin\
+Copy-Item $env:OpenBLAS_HOME\bin\*.dll $DIST_PATH\x64\vc16\bin\
 # pack binary
 Push-Location $DIST_PATH
 7z a -m0=bcj -m1=zstd ..\$TARGET * | Out-Null

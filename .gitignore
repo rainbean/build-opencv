@@ -10,3 +10,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 OpenBLAS-0.3.21
+build
+build-test
+dist
+OpenBLAS

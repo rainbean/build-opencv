@@ -35,9 +35,6 @@ jobs:
         if: contains(matrix.os, 'windows')
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-
       - name: Build artifact
         working-directory: ${{ github.workspace }}
         run: ${{ github.workspace }}/scripts/${{ matrix.command }} ${{ matrix.artifact }}

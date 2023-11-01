@@ -21,10 +21,10 @@ jobs:
         include:
           - os: ubuntu-20.04
             artifact: opencv-linux-${{ github.ref_name }}.tar.zst
-            command: scripts/build.sh
+            command: build.sh
           - os: windows-2019
             artifact: opencv-win64-${{ github.ref_name }}.7z
-            command: scripts/build.ps1
+            command: build.ps1
 
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
 
       - name: Build artifact
         working-directory: ${{ github.workspace }}
-        run: ${{ matrix.command }} ${{ matrix.artifact }}
+        run: ${{ github.workspace }}/scripts/${{ matrix.command }} ${{ matrix.artifact }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4

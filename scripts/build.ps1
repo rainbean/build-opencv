@@ -55,6 +55,7 @@ cmake -Bbuild `
       -DCMAKE_TOOLCHAIN_FILE="${PWD}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
       -DWITH_TBB=ON `
       -DWITH_OPENGL=ON `
+      -DWITH_VA=OFF `
       -DBUILD_TIFF=ON `
       -DBUILD_PNG=ON `
       -DBUILD_JPEG=ON `

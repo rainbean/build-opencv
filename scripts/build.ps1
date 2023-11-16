@@ -30,12 +30,12 @@ if (!(Test-Path .\vcpkg\installed\x64-windows)) {
 }
 
 # Donwload OpenBLAS
-$env:OpenBLAS_HOME = "${PWD}\OpenBLAS"
-if (!(Test-Path $env:OpenBLAS_HOME)) {
-    Invoke-WebRequest https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.24/OpenBLAS-0.3.24-x64.zip -O OpenBLAS.zip
-    Expand-Archive OpenBLAS.zip OpenBLAS
-    Copy-Item OpenBLAS\lib\libopenblas.lib OpenBLAS\lib\openblas.lib
-}
+# $env:OpenBLAS_HOME = "${PWD}\OpenBLAS"
+# if (!(Test-Path $env:OpenBLAS_HOME)) {
+#     Invoke-WebRequest https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.24/OpenBLAS-0.3.24-x64.zip -O OpenBLAS.zip
+#     Expand-Archive OpenBLAS.zip OpenBLAS
+#     Copy-Item OpenBLAS\lib\libopenblas.lib OpenBLAS\lib\openblas.lib
+# }
 
 # Build opencv
 Write-Output "::group::Configure CMake and Build ..."
@@ -85,7 +85,7 @@ Write-Output "::endgroup::"
 Write-Output "::group::Pack artifacts ..."
 # copy deps binary
 Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll $DIST_PATH\x64\vc16\bin\
-Copy-Item $env:OpenBLAS_HOME\bin\*.dll $DIST_PATH\x64\vc16\bin\
+# Copy-Item $env:OpenBLAS_HOME\bin\*.dll $DIST_PATH\x64\vc16\bin\
 # pack binary
 Push-Location $DIST_PATH
 7z a -m0=bcj -m1=zstd ..\$TARGET * | Out-Null

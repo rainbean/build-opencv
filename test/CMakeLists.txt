@@ -8,6 +8,7 @@ project(test LANGUAGES CXX)
 
 # define required library
 find_package(OpenCV REQUIRED)
+find_package(OpenMP REQUIRED)
 
 # specify platform config
 if(MSVC)
@@ -36,4 +37,5 @@ set_property(TARGET test PROPERTY CXX_STANDARD 17)
 target_link_libraries(
     test
     ${OpenCV_LIBS}
+    OpenMP::OpenMP_CXX
 )

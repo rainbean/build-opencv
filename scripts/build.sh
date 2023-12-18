@@ -8,22 +8,7 @@ then
     export VCPKG_DEFAULT_HOST_TRIPLET=x64-linux
     export VCPKG_DEFAULT_TRIPLET=x64-linux
     ./vcpkg/bootstrap-vcpkg.sh
-    ./vcpkg/vcpkg install eigen3 tbb --clean-after-build
-    echo "::endgroup::"
-fi
-
-# Download OpenBLAS
-export OpenBLAS_HOME="$PWD/OpenBLAS"
-if [ ! -d $OpenBLAS_HOME ]
-then
-    echo "::group::Download OpenBLAS ..."
-    wget -q https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.24/OpenBLAS-0.3.24.tar.gz -O OpenBLAS.tgz
-    tar xf OpenBLAS.tgz
-    cd OpenBLAS-0.3.24
-    make NOFORTRAN=1
-    make install PREFIX=$OpenBLAS_HOME
-    cd ..
-    rm -fr OpenBLAS-0.3.24 OpenBLAS.tgz
+    ./vcpkg/vcpkg install intel-mkl eigen3 tbb --clean-after-build
     echo "::endgroup::"
 fi
 
@@ -33,7 +18,7 @@ DIST_PATH="$PWD/dist"
 cmake -Bbuild \
       -Wno-dev \
       -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX="${DIST_PATH}" \
+      -DCMAKE_INSTALL_PREFIX="$DIST_PATH" \
       -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
       -DWITH_TBB=ON \
       -DWITH_OPENGL=ON \

@@ -2,7 +2,7 @@
 param ($TARGET = "opencv-win64.7z")
 
 # Set path
-$env:Path = "C:\Program Files\CMake\bin\;C:\Program Files\NASM\;C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\bin;$env:Path"
+$env:Path = "C:\Program Files\CMake\bin\;C:\Program Files\NASM\;$env:Path"
 
 # install 7zip ZSTD plugin
 if (!(choco list --lo --r -e 7zip-zstd)) {
@@ -14,6 +14,12 @@ if (!(choco list --lo --r -e 7zip-zstd)) {
 if (!(Get-Command nasm -errorAction SilentlyContinue)) {
     Write-Output "::group::Install nasm assembler ..."
     choco install -y nasm | Out-Null
+    Write-Output "::endgroup::"
+}
+
+if (!(Get-Command cmake -errorAction SilentlyContinue)) {
+    Write-Output "::group::Install cmake ..."
+    choco install -y cmake | Out-Null
     Write-Output "::endgroup::"
 }
 
@@ -48,7 +54,7 @@ if (Test-Path dist) {
 
 $DIST_PATH = "${PWD}/dist"
 cmake -Bbuild `
-      -G "Visual Studio 16 2019" `
+      -G "Visual Studio 17 2022" `
       -A x64 `
       -Wno-dev `
       -DCMAKE_INSTALL_PREFIX="${DIST_PATH}" `

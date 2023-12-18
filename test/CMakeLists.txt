@@ -33,6 +33,9 @@ file(GLOB_RECURSE test_files
     "*.cc"
 )
 add_executable(test ${test_files})
+if(MSVC)
+    target_compile_options(test PRIVATE -openmp:llvm -openmp:experimental)
+endif(MSVC)
 set_property(TARGET test PROPERTY CXX_STANDARD 17)
 target_link_libraries(
     test

@@ -50,7 +50,6 @@ echo "::endgroup::"
 
 # pack binary
 echo "::group::Pack artifacts ..."
-cp -a $OpenBLAS_HOME/lib/*.so* $DIST_PATH/lib
 TARGET=${1:-'opencv-linux.tar.zst'}
 tar "-I zstd -3 -T4 --long=27" -cf $TARGET \
     -C $DIST_PATH $(cd $DIST_PATH; echo *)

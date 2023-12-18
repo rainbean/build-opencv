@@ -33,7 +33,7 @@ if (!(Test-Path .\vcpkg\installed\x64-windows)) {
     # replace MKL interface to LP
     $MKL_CMAKE = ".\vcpkg\ports\intel-mkl\portfile.cmake"
     (Get-content $MKL_CMAKE) | Foreach-Object {
-        $_ -replace "ilp64", "lp64" -replace "sequential", "intel_thread"
+        $_ -replace "ilp64", "lp64" -replace "intel_thread", "sequential"
     } | Set-Content $MKL_CMAKE
     # install required libraries
     .\vcpkg\bootstrap-vcpkg.bat
@@ -78,7 +78,6 @@ cmake -Bbuild `
       -DBUILD_opencv_python2=OFF `
       -DBUILD_opencv_python3=OFF `
       -DCV_TRACE=OFF `
-      -DMKL_WITH_OPENMP=ON `
       -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE `
       -DBUILD_LIST="imgcodecs,imgproc,highgui" `
       -DBUILD_opencv_world=ON `
@@ -90,7 +89,7 @@ Write-Output "::endgroup::"
 Write-Output "::group::Pack artifacts ..."
 # copy deps binary
 Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll $DIST_PATH\x64\vc17\bin\
-Copy-Item vcpkg\installed\x64-windows\bin\mkl_intel_thread.2.dll $DIST_PATH\x64\vc17\bin\
+Copy-Item vcpkg\installed\x64-windows\bin\mkl_sequential.2.dll $DIST_PATH\x64\vc17\bin\
 # pack binary
 Push-Location $DIST_PATH
 7z a -m0=bcj -m1=zstd ..\$TARGET * | Out-Null

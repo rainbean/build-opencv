@@ -22,7 +22,7 @@ jobs:
           - os: ubuntu-20.04
             artifact: opencv-linux-${{ github.ref_name }}.tar.zst
             command: build.sh
-          - os: windows-2019
+          - os: windows-2022
             artifact: opencv-win64-${{ github.ref_name }}.7z
             command: build.ps1
 

@@ -29,18 +29,16 @@ if (!(Test-Path .\vcpkg\installed\x64-windows)) {
     # specify triplet
     $env:VCPKG_DEFAULT_HOST_TRIPLET = "x64-windows"
     $env:VCPKG_DEFAULT_TRIPLET = "x64-windows"
+    # refer to https://github.com/facebookresearch/faiss/issues/2641
+    # replace MKL interface to LP
+    $MKL_CMAKE = ".\vcpkg\ports\intel-mkl\portfile.cmake"
+    (Get-content $MKL_CMAKE) | Foreach-Object {
+        $_ -replace "ilp64", "lp64" -replace "sequential", "intel_thread"
+    } | Set-Content $MKL_CMAKE
     # install required libraries
     .\vcpkg\bootstrap-vcpkg.bat
-    .\vcpkg\vcpkg install eigen3 tbb --clean-after-build
+    .\vcpkg\vcpkg install intel-mkl eigen3 tbb --clean-after-build
     Write-Output "::endgroup::"
-}
-
-# Donwload OpenBLAS
-$env:OpenBLAS_HOME = "${PWD}\OpenBLAS"
-if (!(Test-Path $env:OpenBLAS_HOME)) {
-    Invoke-WebRequest https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.24/OpenBLAS-0.3.24-x64.zip -O OpenBLAS.zip
-    Expand-Archive OpenBLAS.zip OpenBLAS
-    Copy-Item OpenBLAS\lib\libopenblas.lib OpenBLAS\lib\openblas.lib
 }
 
 # Build opencv
@@ -80,6 +78,7 @@ cmake -Bbuild `
       -DBUILD_opencv_python2=OFF `
       -DBUILD_opencv_python3=OFF `
       -DCV_TRACE=OFF `
+      -DMKL_WITH_OPENMP=ON `
       -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE `
       -DBUILD_LIST="imgcodecs,imgproc,highgui" `
       -DBUILD_opencv_world=ON `
@@ -90,8 +89,8 @@ Write-Output "::endgroup::"
 # pack binary
 Write-Output "::group::Pack artifacts ..."
 # copy deps binary
-Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll $DIST_PATH\x64\vc16\bin\
-Copy-Item $env:OpenBLAS_HOME\bin\*.dll $DIST_PATH\x64\vc16\bin\
+Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll $DIST_PATH\x64\vc17\bin\
+Copy-Item vcpkg\installed\x64-windows\bin\mkl_intel_thread.2.dll $DIST_PATH\x64\vc17\bin\
 # pack binary
 Push-Location $DIST_PATH
 7z a -m0=bcj -m1=zstd ..\$TARGET * | Out-Null

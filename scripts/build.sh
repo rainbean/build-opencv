@@ -42,7 +42,7 @@ cmake -Bbuild \
       -DBUILD_opencv_python3=OFF \
       -DCV_TRACE=OFF \
       -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE \
-      -DBUILD_LIST="imgcodecs,imgproc,highgui" \
+      -DBUILD_LIST="imgcodecs,imgproc,highgui,features2d,calib3d" \
       -DBUILD_opencv_world=ON \
       opencv
 cmake --build build -j 4 -t install

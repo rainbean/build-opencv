@@ -29,18 +29,15 @@ if (!(Test-Path .\vcpkg\installed\x64-windows)) {
 
     # install required libraries
     .\vcpkg\bootstrap-vcpkg.bat
-    .\vcpkg\vcpkg install eigen3 tbb --triplet x64-windows --clean-after-build
 
     # refer to https://github.com/facebookresearch/faiss/issues/2641
     # replace MKL interface to LP
     $MKL_CMAKE = ".\vcpkg\ports\intel-mkl\portfile.cmake"
     (Get-content $MKL_CMAKE) | Foreach-Object {
-        $_ -replace "ilp64", "lp64" -replace "sequential", "intel_thread"
+        $_ -replace "ilp64", "lp64" -replace "intel_thread", "sequential"
     } | Set-Content $MKL_CMAKE
 
-    .\vcpkg\vcpkg install intel-mkl --triplet x64-windows-static --clean-after-build
-
-    Copy-Item -Path .\vcpkg\installed\x64-windows-static\ -Destination .\vcpkg\installed\x64-windows\ -Recurse -Force
+    .\vcpkg\vcpkg install intel-mkl eigen3 tbb --triplet x64-windows --clean-after-build
     Write-Output "::endgroup::"
 }
 
@@ -82,7 +79,7 @@ cmake -Bbuild `
       -DBUILD_opencv_python3=OFF `
       -DCV_TRACE=OFF `
       -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE `
-      -DBUILD_LIST="imgcodecs,imgproc,highgui" `
+      -DBUILD_LIST="imgcodecs,imgproc,highgui,features2d,calib3d" `
       -DBUILD_opencv_world=ON `
       opencv
 cmake --build build -j 4 -t install --config Release
@@ -92,7 +89,7 @@ Write-Output "::endgroup::"
 Write-Output "::group::Pack artifacts ..."
 # copy deps binary
 Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll $DIST_PATH\x64\vc17\bin\
-Copy-Item vcpkg\installed\x64-windows\bin\libiomp5md.dll $DIST_PATH\x64\vc17\bin\
+Copy-Item vcpkg\installed\x64-windows\bin\mkl_sequential.2.dll $DIST_PATH\x64\vc17\bin\
 # pack binary
 Push-Location $DIST_PATH
 7z a -m0=bcj -m1=zstd ..\$TARGET * | Out-Null

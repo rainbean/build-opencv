@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             artifact: opencv-linux-${{ github.ref_name }}.tar.zst
             command: build.sh
           - os: windows-2022

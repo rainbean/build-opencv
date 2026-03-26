@@ -37,7 +37,7 @@ if (!(Test-Path .\vcpkg\installed\x64-windows)) {
         $_ -replace "ilp64", "lp64" -replace "intel_thread", "sequential"
     } | Set-Content $MKL_CMAKE
 
-    .\vcpkg\vcpkg install intel-mkl eigen3 tbb --triplet x64-windows --clean-after-build
+    .\vcpkg\vcpkg install intel-mkl tbb libjpeg-turbo --triplet x64-windows --clean-after-build
     Write-Output "::endgroup::"
 }
 
@@ -58,13 +58,14 @@ cmake -Bbuild `
       -DCMAKE_INSTALL_PREFIX="${DIST_PATH}" `
       -DCMAKE_TOOLCHAIN_FILE="${PWD}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
       -DWITH_TBB=ON `
-      -DWITH_OPENGL=ON `
+      -DWITH_OPENGL=OFF `
       -DWITH_VA=OFF `
-      -DBUILD_TIFF=ON `
+      -DBUILD_TIFF=OFF `
       -DBUILD_PNG=ON `
-      -DBUILD_JPEG=ON `
+      -DBUILD_JPEG=OFF `
+      -DWITH_JPEG=ON `
       -DBUILD_WEBP=ON `
-      -DBUILD_OPENJPEG=ON `
+      -DBUILD_OPENJPEG=OFF `
       -DWITH_AVIF=OFF `
       -DWITH_QT=OFF `
       -DWITH_OPENEXR=OFF `
@@ -79,7 +80,7 @@ cmake -Bbuild `
       -DBUILD_opencv_python3=OFF `
       -DCV_TRACE=OFF `
       -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE `
-      -DBUILD_LIST="imgcodecs,imgproc,highgui,features2d,calib3d" `
+      -DBUILD_LIST="imgcodecs,imgproc" `
       -DBUILD_opencv_world=ON `
       opencv
 cmake --build build -j 4 -t install --config Release
@@ -90,6 +91,7 @@ Write-Output "::group::Pack artifacts ..."
 # copy deps binary
 Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll $DIST_PATH\x64\vc17\bin\
 Copy-Item vcpkg\installed\x64-windows\bin\mkl_sequential.2.dll $DIST_PATH\x64\vc17\bin\
+Copy-Item vcpkg\installed\x64-windows\bin\turbojpeg.dll $DIST_PATH\x64\vc17\bin\
 # pack binary
 Push-Location $DIST_PATH
 7z a -m0=bcj -m1=zstd ..\$TARGET * | Out-Null

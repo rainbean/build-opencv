@@ -8,7 +8,7 @@ then
     export VCPKG_DEFAULT_HOST_TRIPLET=x64-linux
     export VCPKG_DEFAULT_TRIPLET=x64-linux
     ./vcpkg/bootstrap-vcpkg.sh
-    ./vcpkg/vcpkg install intel-mkl eigen3 tbb --clean-after-build
+    ./vcpkg/vcpkg install intel-mkl tbb libjpeg-turbo --clean-after-build
     echo "::endgroup::"
 fi
 
@@ -21,13 +21,14 @@ cmake -Bbuild \
       -DCMAKE_INSTALL_PREFIX="$DIST_PATH" \
       -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
       -DWITH_TBB=ON \
-      -DWITH_OPENGL=ON \
+      -DWITH_OPENGL=OFF \
       -DWITH_VA=OFF \
-      -DBUILD_TIFF=ON \
+      -DBUILD_TIFF=OFF \
       -DBUILD_PNG=ON \
-      -DBUILD_JPEG=ON \
+      -DBUILD_JPEG=OFF \
+      -DWITH_JPEG=ON \
       -DBUILD_WEBP=ON \
-      -DBUILD_OPENJPEG=ON \
+      -DBUILD_OPENJPEG=OFF \
       -DWITH_AVIF=OFF \
       -DWITH_QT=OFF \
       -DWITH_OPENEXR=OFF \
@@ -42,7 +43,7 @@ cmake -Bbuild \
       -DBUILD_opencv_python3=OFF \
       -DCV_TRACE=OFF \
       -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE \
-      -DBUILD_LIST="imgcodecs,imgproc,highgui,features2d,calib3d" \
+      -DBUILD_LIST="imgcodecs,imgproc" \
       -DBUILD_opencv_world=ON \
       opencv
 cmake --build build -j 4 -t install

@@ -44,6 +44,9 @@ cmake -Bbuild \
       -DCV_TRACE=OFF \
       -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE \
       -DBUILD_LIST="imgcodecs,imgproc" \
+      -DBUILD_opencv_highgui=OFF \
+      -DBUILD_opencv_features2d=OFF \
+      -DBUILD_opencv_calib3d=OFF \
       -DBUILD_opencv_world=ON \
       opencv
 cmake --build build -j 4 -t install

@@ -24,11 +24,13 @@ cmake -Bbuild \
       -DWITH_OPENGL=OFF \
       -DWITH_VA=OFF \
       -DBUILD_TIFF=OFF \
+      -DWITH_TIFF=OFF \
       -DBUILD_PNG=ON \
       -DBUILD_JPEG=OFF \
       -DWITH_JPEG=ON \
       -DBUILD_WEBP=ON \
       -DBUILD_OPENJPEG=OFF \
+      -DWITH_OPENJPEG=OFF \
       -DWITH_AVIF=OFF \
       -DWITH_QT=OFF \
       -DWITH_OPENEXR=OFF \

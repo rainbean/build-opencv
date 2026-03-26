@@ -5,21 +5,15 @@ param ($TARGET = "opencv-win64.7z")
 $env:Path = "C:\Program Files\CMake\bin\;C:\Program Files\NASM\;$env:Path"
 
 # install 7zip ZSTD plugin
-if (!(choco list --lo --r -e 7zip-zstd)) {
+if (!(Get-Command 7z -errorAction SilentlyContinue)) {
     Write-Output "::group::Install 7Z-ZSTD plugin ..."
-    choco install -y 7zip-zstd | Out-Null
-    Write-Output "::endgroup::"
-}
-
-if (!(Get-Command nasm -errorAction SilentlyContinue)) {
-    Write-Output "::group::Install nasm assembler ..."
-    choco install -y nasm | Out-Null
+    winget install 7zip-zstd | Out-Null
     Write-Output "::endgroup::"
 }
 
 if (!(Get-Command cmake -errorAction SilentlyContinue)) {
     Write-Output "::group::Install cmake ..."
-    choco install -y cmake | Out-Null
+    winget install cmake | Out-Null
     Write-Output "::endgroup::"
 }
 

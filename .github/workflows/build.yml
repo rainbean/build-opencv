@@ -22,25 +22,28 @@ jobs:
           - os: ubuntu-22.04
             artifact: opencv-linux-${{ github.ref_name }}.tar.zst
             command: build.sh
+          - os: ubuntu-22.04-arm
+            artifact: opencv-linux-arm64-${{ github.ref_name }}.tar.zst
+            command: build.sh
           - os: windows-2022
             artifact: opencv-win64-${{ github.ref_name }}.7z
             command: build.ps1
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
 
       - name: Add MSBuild to PATH
         if: contains(matrix.os, 'windows')
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v3
 
       - name: Build artifact
         working-directory: ${{ github.workspace }}
         run: ${{ github.workspace }}/scripts/${{ matrix.command }} ${{ matrix.artifact }}
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.aws_iam_role }}
           aws-region: ap-northeast-1

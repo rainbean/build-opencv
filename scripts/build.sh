@@ -1,14 +1,21 @@
 #!/bin/bash
 
+# Detect CPU architecture and select the appropriate vcpkg triplet
+ARCH=$(uname -m)
+if [ "$ARCH" = "aarch64" ]; then
+    TRIPLET=arm64-linux
+else
+    TRIPLET=x64-linux
+fi
+
 # install required 3rd party libraries
-if [ ! -d "./vcpkg/installed/x64-linux/lib" ]
+if [ ! -d "./vcpkg/installed/$TRIPLET/lib" ]
 then
     echo "::group::Install vcpkg libraries ..."
-    # specify triplet
-    export VCPKG_DEFAULT_HOST_TRIPLET=x64-linux
-    export VCPKG_DEFAULT_TRIPLET=x64-linux
+    export VCPKG_DEFAULT_HOST_TRIPLET=$TRIPLET
+    export VCPKG_DEFAULT_TRIPLET=$TRIPLET
     ./vcpkg/bootstrap-vcpkg.sh
-    ./vcpkg/vcpkg install intel-mkl eigen3 tbb --clean-after-build
+    ./vcpkg/vcpkg install openblas tbb libjpeg-turbo --clean-after-build
     echo "::endgroup::"
 fi
 
@@ -21,13 +28,19 @@ cmake -Bbuild \
       -DCMAKE_INSTALL_PREFIX="$DIST_PATH" \
       -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
       -DWITH_TBB=ON \
-      -DWITH_OPENGL=ON \
+      -DWITH_MKL=OFF \
+      -DWITH_OPENBLAS=ON \
+      -DWITH_LAPACK=OFF \
+      -DWITH_OPENGL=OFF \
       -DWITH_VA=OFF \
-      -DBUILD_TIFF=ON \
+      -DBUILD_TIFF=OFF \
+      -DWITH_TIFF=OFF \
       -DBUILD_PNG=ON \
-      -DBUILD_JPEG=ON \
+      -DBUILD_JPEG=OFF \
+      -DWITH_JPEG=ON \
       -DBUILD_WEBP=ON \
-      -DBUILD_OPENJPEG=ON \
+      -DBUILD_OPENJPEG=OFF \
+      -DWITH_OPENJPEG=OFF \
       -DWITH_AVIF=OFF \
       -DWITH_QT=OFF \
       -DWITH_OPENEXR=OFF \
@@ -42,7 +55,10 @@ cmake -Bbuild \
       -DBUILD_opencv_python3=OFF \
       -DCV_TRACE=OFF \
       -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE \
-      -DBUILD_LIST="imgcodecs,imgproc,highgui,features2d,calib3d" \
+      -DBUILD_LIST="imgcodecs,imgproc" \
+      -DBUILD_opencv_highgui=OFF \
+      -DBUILD_opencv_features2d=OFF \
+      -DBUILD_opencv_calib3d=OFF \
       -DBUILD_opencv_world=ON \
       opencv
 cmake --build build -j 4 -t install

@@ -4,40 +4,17 @@ param ($TARGET = "opencv-win64.7z")
 # Set path
 $env:Path = "C:\Program Files\CMake\bin\;C:\Program Files\NASM\;$env:Path"
 
-# install 7zip ZSTD plugin
-if (!(choco list --lo --r -e 7zip-zstd)) {
-    Write-Output "::group::Install 7Z-ZSTD plugin ..."
-    choco install -y 7zip-zstd | Out-Null
-    Write-Output "::endgroup::"
-}
-
-if (!(Get-Command nasm -errorAction SilentlyContinue)) {
-    Write-Output "::group::Install nasm assembler ..."
-    choco install -y nasm | Out-Null
-    Write-Output "::endgroup::"
-}
-
 if (!(Get-Command cmake -errorAction SilentlyContinue)) {
     Write-Output "::group::Install cmake ..."
-    choco install -y cmake | Out-Null
+    winget install cmake | Out-Null
     Write-Output "::endgroup::"
 }
 
 # install required 3rd party libraries
 if (!(Test-Path .\vcpkg\installed\x64-windows)) {
     Write-Output "::group::Install vcpkg libraries ..."
-
-    # install required libraries
     .\vcpkg\bootstrap-vcpkg.bat
-
-    # refer to https://github.com/facebookresearch/faiss/issues/2641
-    # replace MKL interface to LP
-    $MKL_CMAKE = ".\vcpkg\ports\intel-mkl\portfile.cmake"
-    (Get-content $MKL_CMAKE) | Foreach-Object {
-        $_ -replace "ilp64", "lp64" -replace "intel_thread", "sequential"
-    } | Set-Content $MKL_CMAKE
-
-    .\vcpkg\vcpkg install intel-mkl eigen3 tbb --triplet x64-windows --clean-after-build
+    .\vcpkg\vcpkg install openblas tbb libjpeg-turbo --triplet x64-windows --overlay-triplets patch --clean-after-build
     Write-Output "::endgroup::"
 }
 
@@ -58,13 +35,19 @@ cmake -Bbuild `
       -DCMAKE_INSTALL_PREFIX="${DIST_PATH}" `
       -DCMAKE_TOOLCHAIN_FILE="${PWD}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
       -DWITH_TBB=ON `
-      -DWITH_OPENGL=ON `
+      -DWITH_MKL=OFF `
+      -DWITH_OPENBLAS=ON `
+      -DWITH_LAPACK=OFF `
+      -DWITH_OPENGL=OFF `
       -DWITH_VA=OFF `
-      -DBUILD_TIFF=ON `
+      -DBUILD_TIFF=OFF `
+      -DWITH_TIFF=OFF `
       -DBUILD_PNG=ON `
-      -DBUILD_JPEG=ON `
+      -DBUILD_JPEG=OFF `
+      -DWITH_JPEG=ON `
       -DBUILD_WEBP=ON `
-      -DBUILD_OPENJPEG=ON `
+      -DBUILD_OPENJPEG=OFF `
+      -DWITH_OPENJPEG=OFF `
       -DWITH_AVIF=OFF `
       -DWITH_QT=OFF `
       -DWITH_OPENEXR=OFF `
@@ -79,7 +62,10 @@ cmake -Bbuild `
       -DBUILD_opencv_python3=OFF `
       -DCV_TRACE=OFF `
       -DCMAKE_BUILD_RPATH_USE_ORIGIN=TRUE `
-      -DBUILD_LIST="imgcodecs,imgproc,highgui,features2d,calib3d" `
+      -DBUILD_LIST="imgcodecs,imgproc" `
+      -DBUILD_opencv_highgui=OFF `
+      -DBUILD_opencv_features2d=OFF `
+      -DBUILD_opencv_calib3d=OFF `
       -DBUILD_opencv_world=ON `
       opencv
 cmake --build build -j 4 -t install --config Release
@@ -87,11 +73,10 @@ Write-Output "::endgroup::"
 
 # pack binary
 Write-Output "::group::Pack artifacts ..."
-# copy deps binary
+# copy dynamic deps (openblas and jpeg are static via patch/x64-windows.cmake)
 Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll $DIST_PATH\x64\vc17\bin\
-Copy-Item vcpkg\installed\x64-windows\bin\mkl_sequential.2.dll $DIST_PATH\x64\vc17\bin\
-# pack binary
+# pack binary (standard 7z LZMA2, no plugin required)
 Push-Location $DIST_PATH
-7z a -m0=bcj -m1=zstd ..\$TARGET * | Out-Null
+7z a -mx=3 ..\$TARGET * | Out-Null
 Pop-Location
 Write-Output "::endgroup::"

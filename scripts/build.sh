@@ -8,7 +8,7 @@ then
     export VCPKG_DEFAULT_HOST_TRIPLET=x64-linux
     export VCPKG_DEFAULT_TRIPLET=x64-linux
     ./vcpkg/bootstrap-vcpkg.sh
-    ./vcpkg/vcpkg install intel-mkl tbb libjpeg-turbo --clean-after-build
+    ./vcpkg/vcpkg install openblas tbb libjpeg-turbo --clean-after-build
     echo "::endgroup::"
 fi
 
@@ -21,6 +21,9 @@ cmake -Bbuild \
       -DCMAKE_INSTALL_PREFIX="$DIST_PATH" \
       -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
       -DWITH_TBB=ON \
+      -DWITH_MKL=OFF \
+      -DWITH_OPENBLAS=ON \
+      -DWITH_LAPACK=OFF \
       -DWITH_OPENGL=OFF \
       -DWITH_VA=OFF \
       -DBUILD_TIFF=OFF \

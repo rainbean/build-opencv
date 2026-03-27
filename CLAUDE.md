@@ -63,7 +63,8 @@ GitHub Actions (`.github/workflows/build.yml`) runs matrix builds on Ubuntu 22.0
 Only a subset of OpenCV is compiled: `imgcodecs`, `imgproc`. FFmpeg, Qt, Python bindings, Java, tests, and docs are all disabled.
 
 ### Dependencies (via vcpkg)
-- Intel MKL (math/BLAS backend)
+- OpenBLAS (Linux; benchmarked identical to intel-mkl for this pipeline)
+- Intel MKL (Windows only)
 - TBB (threading)
 - Image codecs: libpng, libjpeg-turbo, libwebp
 

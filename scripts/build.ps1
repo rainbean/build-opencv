@@ -14,7 +14,7 @@ if (!(Get-Command cmake -errorAction SilentlyContinue)) {
 if (!(Test-Path .\vcpkg\installed\x64-windows)) {
     Write-Output "::group::Install vcpkg libraries ..."
     .\vcpkg\bootstrap-vcpkg.bat
-    .\vcpkg\vcpkg install openblas tbb libjpeg-turbo --triplet x64-windows --clean-after-build
+    .\vcpkg\vcpkg install openblas tbb libjpeg-turbo --triplet x64-windows --overlay-triplets patch --clean-after-build
     Write-Output "::endgroup::"
 }
 
@@ -73,10 +73,8 @@ Write-Output "::endgroup::"
 
 # pack binary
 Write-Output "::group::Pack artifacts ..."
-# copy deps binary
+# copy dynamic deps (openblas and jpeg are static via patch/x64-windows.cmake)
 Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll $DIST_PATH\x64\vc17\bin\
-Copy-Item vcpkg\installed\x64-windows\bin\openblas.dll $DIST_PATH\x64\vc17\bin\
-Copy-Item vcpkg\installed\x64-windows\bin\jpeg62.dll $DIST_PATH\x64\vc17\bin\
 # pack binary (standard 7z LZMA2, no plugin required)
 Push-Location $DIST_PATH
 7z a -mx=3 ..\$TARGET * | Out-Null

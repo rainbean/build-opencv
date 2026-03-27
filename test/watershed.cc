@@ -122,13 +122,25 @@ ProcessResult process(const Mat &src) {
     return result;
 }
 
-static void validate(const ProcessResult &r, const ProcessResult &ref, int iter) {
-    assert(r.bbox_areas.size() == ref.bbox_areas.size());
+// Golden reference bbox areas established on Linux x64 + Windows x64 with intel-mkl.
+// Identical across both platforms (deterministic integer arithmetic).
+// Update this if the input image or algorithm intentionally changes.
+static const vector<int> GOLDEN_BBOX_AREAS = {
+    2596, 2976, 3540, 285, 3904, 4104, 3942, 2430, 1920, 3481, 3654, 3481, 3008, 2880
+};
+static constexpr double BBOX_TOLERANCE = 0.02; // ±2%
+
+static void validate(const ProcessResult &r, int iter) {
+    if (r.bbox_areas.size() != GOLDEN_BBOX_AREAS.size()) {
+        std::cerr << "[FAIL]\titer=" << iter << " contour count=" << r.bbox_areas.size()
+                  << " expected=" << GOLDEN_BBOX_AREAS.size() << std::endl;
+        assert(false);
+    }
     for (size_t j = 0; j < r.bbox_areas.size(); j++) {
-        double delta = std::fabs(r.bbox_areas[j] - ref.bbox_areas[j]) / (double)ref.bbox_areas[j];
-        if (delta > 0.02) {
+        double delta = std::fabs(r.bbox_areas[j] - GOLDEN_BBOX_AREAS[j]) / (double)GOLDEN_BBOX_AREAS[j];
+        if (delta > BBOX_TOLERANCE) {
             std::cerr << "[FAIL]\titer=" << iter << " contour=" << j
-                      << " area=" << r.bbox_areas[j] << " ref=" << ref.bbox_areas[j]
+                      << " area=" << r.bbox_areas[j] << " golden=" << GOLDEN_BBOX_AREAS[j]
                       << " delta=" << delta * 100.0 << "%" << std::endl;
             assert(false);
         }
@@ -150,13 +162,14 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    // Establish reference from a single baseline run
+    // Baseline run: print actuals and validate against golden reference
     ProcessResult ref = process(src);
     std::cerr << "[REF]\tcontours=" << ref.bbox_areas.size()
               << " watershed=" << ref.watershed_ms << "ms" << std::endl;
     std::cerr << "[REF]\tbbox_areas:";
     for (int a : ref.bbox_areas) std::cerr << " " << a;
     std::cerr << std::endl;
+    validate(ref, -1); // -1 = baseline, fails fast before the loop if platform diverges
 
     // 100-iteration benchmark loop
     vector<ProcessResult> results(100);
@@ -175,9 +188,9 @@ int main(int argc, char *argv[])
 
     auto loop_ms = duration(timeNow() - loop_start);
 
-    // Validate all results against reference
+    // Validate all results against golden reference
     for (size_t i = 0; i < results.size(); i++) {
-        validate(results[i], ref, i);
+        validate(results[i], i);
     }
 
     // Timing summary

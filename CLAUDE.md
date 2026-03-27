@@ -56,17 +56,16 @@ GitHub Actions (`.github/workflows/build.yml`) runs matrix builds on Ubuntu 22.0
 ## Architecture
 
 ### Build System
-- `scripts/build.sh` / `scripts/build.ps1`: Main build scripts. Install vcpkg dependencies (intel-mkl, eigen3, tbb), configure CMake, build OpenCV, and pack the `dist/` directory.
+- `scripts/build.sh` / `scripts/build.ps1`: Main build scripts. Install vcpkg dependencies (intel-mkl, tbb, libjpeg-turbo), configure CMake, build OpenCV, and pack the `dist/` directory.
 - Output: `dist/` directory → `opencv-linux-{tag}.tar.zst` (Linux) or `opencv-win64-{tag}.7z` (Windows)
 
 ### OpenCV Modules Built
-Only a subset of OpenCV is compiled: `imgcodecs`, `imgproc`, `highgui`, `features2d`, `calib3d`. FFmpeg, Qt, Python bindings, Java, tests, and docs are all disabled.
+Only a subset of OpenCV is compiled: `imgcodecs`, `imgproc`. FFmpeg, Qt, Python bindings, Java, tests, and docs are all disabled.
 
 ### Dependencies (via vcpkg)
-- Intel MKL (math/BLAS backend, replaces OpenBLAS)
-- Eigen3
+- Intel MKL (math/BLAS backend)
 - TBB (threading)
-- Image codecs: libpng, libjpeg, libtiff, libwebp, libopenjpeg
+- Image codecs: libpng, libjpeg-turbo, libwebp
 
 ### Patches
 - `patch/x64-windows.cmake`: vcpkg triplet for Windows (static CRT/libs, dynamic TBB, release-only)

@@ -90,7 +90,7 @@ Write-Output "::group::Pack artifacts ..."
 # copy deps binary
 Copy-Item vcpkg\installed\x64-windows\bin\tbb12.dll $DIST_PATH\x64\vc17\bin\
 Copy-Item vcpkg\installed\x64-windows\bin\mkl_sequential.2.dll $DIST_PATH\x64\vc17\bin\
-Copy-Item vcpkg\installed\x64-windows\bin\turbojpeg.dll $DIST_PATH\x64\vc17\bin\
+Copy-Item vcpkg\installed\x64-windows\bin\jpeg62.dll $DIST_PATH\x64\vc17\bin\
 # pack binary
 Push-Location $DIST_PATH
 7z a -m0=bcj -m1=zstd ..\$TARGET * | Out-Null

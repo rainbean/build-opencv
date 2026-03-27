@@ -1,12 +1,19 @@
 #!/bin/bash
 
+# Detect CPU architecture and select the appropriate vcpkg triplet
+ARCH=$(uname -m)
+if [ "$ARCH" = "aarch64" ]; then
+    TRIPLET=arm64-linux
+else
+    TRIPLET=x64-linux
+fi
+
 # install required 3rd party libraries
-if [ ! -d "./vcpkg/installed/x64-linux/lib" ]
+if [ ! -d "./vcpkg/installed/$TRIPLET/lib" ]
 then
     echo "::group::Install vcpkg libraries ..."
-    # specify triplet
-    export VCPKG_DEFAULT_HOST_TRIPLET=x64-linux
-    export VCPKG_DEFAULT_TRIPLET=x64-linux
+    export VCPKG_DEFAULT_HOST_TRIPLET=$TRIPLET
+    export VCPKG_DEFAULT_TRIPLET=$TRIPLET
     ./vcpkg/bootstrap-vcpkg.sh
     ./vcpkg/vcpkg install openblas tbb libjpeg-turbo --clean-after-build
     echo "::endgroup::"

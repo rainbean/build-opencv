@@ -1,0 +1,126 @@
+This distribution includes third-party software listed below.
+Each entry identifies the copyright holder, license, and canonical source.
+
+--------------------------------------------------------------------------------
+OpenCV 4.11.0
+--------------------------------------------------------------------------------
+Copyright (c) 2000-2024 Intel Corporation
+Copyright (c) 2009-2011 Willow Garage Inc.
+Copyright (c) 2009-2016 NVIDIA Corporation
+Copyright (c) 2010-2013 Advanced Micro Devices, Inc.
+Copyright (c) 2015-2023 OpenCV Foundation
+Copyright (c) 2008-2016 Itseez LLC
+SPDX-License-Identifier: Apache-2.0
+https://github.com/opencv/opencv
+
+--------------------------------------------------------------------------------
+Intel(R) Integrated Performance Primitives — ippicv 2021.12.0
+Intel(R) IPP Wrappers — ippiw
+--------------------------------------------------------------------------------
+Copyright (c) 1997 Intel Corporation
+SPDX-License-Identifier: LicenseRef-Intel-Simplified-Software-License
+https://github.com/opencv/opencv_3rdparty
+
+These libraries are provided in binary form and are redistributed under the
+Intel Simplified Software License (Version October 2022). Reverse engineering,
+decompilation, or modification is not permitted.
+
+--------------------------------------------------------------------------------
+libjpeg-turbo 3.1.0
+--------------------------------------------------------------------------------
+Copyright (c) 1991-2024 The libjpeg-turbo Project and many others
+SPDX-License-Identifier: IJG AND BSD-3-Clause
+https://github.com/libjpeg-turbo/libjpeg-turbo
+
+The IJG license governs the libjpeg API library; the BSD-3-Clause license
+governs the TurboJPEG API library and build system. See the project's
+LICENSE.md for the full breakdown.
+
+--------------------------------------------------------------------------------
+libwebp
+--------------------------------------------------------------------------------
+Copyright (c) 2010 Google Inc. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+https://chromium.googlesource.com/webm/libwebp
+
+--------------------------------------------------------------------------------
+libpng
+--------------------------------------------------------------------------------
+Copyright (c) 1995-2024 The PNG Reference Library Authors.
+Copyright (c) 2018-2024 Cosmin Truta.
+Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.
+Copyright (c) 1996-1997 Andreas Dilger.
+Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
+SPDX-License-Identifier: libpng-2.0
+http://www.libpng.org/pub/png/libpng.html
+
+--------------------------------------------------------------------------------
+libjasper (JasPer)
+--------------------------------------------------------------------------------
+Copyright (c) 2001-2006 Michael David Adams
+Copyright (c) 1999-2000 Image Power, Inc.
+Copyright (c) 1999-2000 The University of British Columbia
+SPDX-License-Identifier: JasPer-2.0
+https://www.ece.uvic.ca/~frodo/jasper/
+
+--------------------------------------------------------------------------------
+SoftFloat Release 3c
+--------------------------------------------------------------------------------
+Copyright (c) 2011-2017 The Regents of the University of California.
+SPDX-License-Identifier: BSD-3-Clause
+http://www.jhauser.us/arithmetic/SoftFloat.html
+
+--------------------------------------------------------------------------------
+FlatBuffers
+--------------------------------------------------------------------------------
+Copyright (c) 2014 Google Inc.
+SPDX-License-Identifier: Apache-2.0
+https://github.com/google/flatbuffers
+
+--------------------------------------------------------------------------------
+Protocol Buffers (protobuf)
+--------------------------------------------------------------------------------
+Copyright (c) 2008 Google Inc.
+SPDX-License-Identifier: BSD-3-Clause
+https://github.com/google/protobuf
+
+--------------------------------------------------------------------------------
+ADE Graph Analytics Framework
+--------------------------------------------------------------------------------
+Copyright (c) 2017-2020 Intel Corporation
+SPDX-License-Identifier: Apache-2.0
+https://github.com/opencv/ade
+
+--------------------------------------------------------------------------------
+OpenCL Headers
+--------------------------------------------------------------------------------
+Copyright (c) 2008-2015 The Khronos Group Inc.
+SPDX-License-Identifier: Khronos
+https://www.khronos.org/registry/OpenCL/
+
+--------------------------------------------------------------------------------
+oneTBB / tbb12.dll (Windows only)
+--------------------------------------------------------------------------------
+Copyright (c) 2005-2024 Intel Corporation
+SPDX-License-Identifier: Apache-2.0
+https://github.com/oneapi-src/oneTBB
+
+This library is bundled as a dynamic DLL (tbb12.dll) in the Windows
+distribution only. It is NOT included in the Linux distribution.
+
+--------------------------------------------------------------------------------
+OpenBLAS (Windows only) — statically linked
+--------------------------------------------------------------------------------
+Copyright (c) 2011-2014 The OpenBLAS Project
+SPDX-License-Identifier: BSD-3-Clause
+https://github.com/OpenMathLib/OpenBLAS
+
+OpenBLAS is statically linked in the Windows distribution only. It is NOT
+bundled in the Linux distribution (LAPACK linkage is disabled in that build).
+
+--------------------------------------------------------------------------------
+OpenBLAS — Linux build dependency (NOT bundled)
+--------------------------------------------------------------------------------
+OpenBLAS is NOT bundled in the Linux distribution. It is downloaded at build
+time via vcpkg and is subject to the BSD-3-Clause license.
+https://github.com/OpenMathLib/OpenBLAS

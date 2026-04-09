@@ -64,6 +64,9 @@ cmake -Bbuild \
 cmake --build build -j 4 -t install
 echo "::endgroup::"
 
+# copy license files into dist so they are included in the archive
+cp LICENSE THIRD-PARTY-NOTICES "$DIST_PATH/"
+
 # pack binary
 echo "::group::Pack artifacts ..."
 TARGET=${1:-'opencv-linux.tar.zst'}

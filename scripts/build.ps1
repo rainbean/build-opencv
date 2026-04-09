@@ -71,6 +71,9 @@ cmake -Bbuild `
 cmake --build build -j 4 -t install --config Release
 Write-Output "::endgroup::"
 
+# copy license files into dist so they are included in the archive
+cp LICENSE, THIRD-PARTY-NOTICES $DIST_PATH
+
 # pack binary
 Write-Output "::group::Pack artifacts ..."
 # copy dynamic deps (openblas and jpeg are static via patch/x64-windows.cmake)
